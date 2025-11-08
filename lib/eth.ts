@@ -55,7 +55,7 @@ function getBrowserProviderAndSigner() {
   if (typeof (window as any).ethereum === 'undefined') {
     throw new Error('지갑(MetaMask)이 설치되어 있지 않습니다.')
   }
-  
+
   // [수정됨] window.ethereum -> (window as any).ethereum
   const provider = new ethers.BrowserProvider((window as any).ethereum)
   const signer = provider.getSigner()
@@ -79,12 +79,12 @@ async function getWritableContract() {
   const { provider, signer } = getBrowserProviderAndSigner()
   // 네트워크가 Sepolia인지 확인 (Chain ID 11155111)
   const network = await provider.getNetwork()
-  
-  // 👇 [수정됨] 11155111n -> BigInt(11155111)
+
+  // [수정됨] 11155111n -> BigInt(11155111)
   if (network.chainId !== BigInt(11155111)) { // 11155111n은 Sepolia Chain ID
     throw new Error('네트워크 오류: Sepolia 테스트넷으로 변경해주세요.')
   }
-  
+
   const contract = new ethers.Contract(contractAddress, contractABI, await signer)
   return contract
 }
@@ -98,12 +98,12 @@ export async function connectWallet(): Promise<string> {
   if (typeof (window as any).ethereum === 'undefined') {
     throw new Error('지갑(MetaMask)이 설치되어 있지 않습니다.')
   }
-  
-  // [수정됨] window.ethereum -> (window as any).ethereum
-  const accounts = await (window as any).ethereum.request<string[]>({
+
+  // 👇 [수정됨] request<string[]> -> (await ... request(...)) as string[]
+  const accounts = (await (window as any).ethereum.request({
     method: 'eth_requestAccounts',
-  })
-  
+  })) as string[]
+
   if (!accounts || accounts.length === 0) {
     throw new Error('지갑 연결에 실패했습니다.')
   }
