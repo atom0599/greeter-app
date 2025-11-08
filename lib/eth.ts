@@ -1,8 +1,6 @@
 import { ethers } from 'ethers'
 
 // Greeter.sol의 ABI (Application Binary Interface)
-// 이 부분은 Greeter.sol을 컴파일한 후 Remix에서 복사해도 되고,
-// 이 코드를 그대로 사용해도 됩니다.
 const contractABI = [
   {
     inputs: [
@@ -44,7 +42,7 @@ const contractABI = [
 ]
 
 // 1. 여기에 1단계에서 배포한 Greeter.sol의 "새 주소"를 넣으세요!
-const contractAddress = '0x7234ffbd91b9Bb27d3317Ea4F520886D3b6795D1'
+const contractAddress = 'YOUR_NEW_CONTRACT_ADDRESS' // 👈 이 부분은 직접 수정하셔야 합니다!
 
 // 2. Sepolia RPC URL (Vercel 환경변수에도 등록 필요)
 const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL || 'https://rpc.sepolia.org'
@@ -53,11 +51,13 @@ const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL || 'https://rpc.sepolia.org'
  * 브라우저 지갑 (MetaMask)과 상호작용하기 위한 Provider와 Signer를 반환
  */
 function getBrowserProviderAndSigner() {
-  if (typeof window.ethereum === 'undefined') {
+  // 👇 [수정됨] window.ethereum -> (window as any).ethereum
+  if (typeof (window as any).ethereum === 'undefined') {
     throw new Error('지갑(MetaMask)이 설치되어 있지 않습니다.')
   }
   
-  const provider = new ethers.BrowserProvider(window.ethereum)
+  // 👇 [수정됨] window.ethereum -> (window as any).ethereum
+  const provider = new ethers.BrowserProvider((window as any).ethereum)
   const signer = provider.getSigner() // Signer는 쓰기 작업을 위해 필요
   return { provider, signer }
 }
@@ -92,11 +92,13 @@ async function getWritableContract() {
  * @returns {Promise<string>}
  */
 export async function connectWallet(): Promise<string> {
-  if (typeof window.ethereum === 'undefined') {
+  // 👇 [수정됨] window.ethereum -> (window as any).ethereum
+  if (typeof (window as any).ethereum === 'undefined') {
     throw new Error('지갑(MetaMask)이 설치되어 있지 않습니다.')
   }
   
-  const accounts = await window.ethereum.request<string[]>({
+  // 👇 [수정됨] window.ethereum -> (window as any).ethereum
+  const accounts = await (window as any).ethereum.request<string[]>({
     method: 'eth_requestAccounts',
   })
   
