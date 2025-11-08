@@ -51,14 +51,14 @@ const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL || 'https://rpc.sepolia.org'
  * 브라우저 지갑 (MetaMask)과 상호작용하기 위한 Provider와 Signer를 반환
  */
 function getBrowserProviderAndSigner() {
-  // 👇 [수정됨] window.ethereum -> (window as any).ethereum
+  // [수정됨] window.ethereum -> (window as any).ethereum
   if (typeof (window as any).ethereum === 'undefined') {
     throw new Error('지갑(MetaMask)이 설치되어 있지 않습니다.')
   }
   
-  // 👇 [수정됨] window.ethereum -> (window as any).ethereum
+  // [수정됨] window.ethereum -> (window as any).ethereum
   const provider = new ethers.BrowserProvider((window as any).ethereum)
-  const signer = provider.getSigner() // Signer는 쓰기 작업을 위해 필요
+  const signer = provider.getSigner()
   return { provider, signer }
 }
 
@@ -79,7 +79,9 @@ async function getWritableContract() {
   const { provider, signer } = getBrowserProviderAndSigner()
   // 네트워크가 Sepolia인지 확인 (Chain ID 11155111)
   const network = await provider.getNetwork()
-  if (network.chainId !== 11155111n) { // 11155111n은 Sepolia Chain ID
+  
+  // 👇 [수정됨] 11155111n -> BigInt(11155111)
+  if (network.chainId !== BigInt(11155111)) { // 11155111n은 Sepolia Chain ID
     throw new Error('네트워크 오류: Sepolia 테스트넷으로 변경해주세요.')
   }
   
@@ -92,12 +94,12 @@ async function getWritableContract() {
  * @returns {Promise<string>}
  */
 export async function connectWallet(): Promise<string> {
-  // 👇 [수정됨] window.ethereum -> (window as any).ethereum
+  // [수정됨] window.ethereum -> (window as any).ethereum
   if (typeof (window as any).ethereum === 'undefined') {
     throw new Error('지갑(MetaMask)이 설치되어 있지 않습니다.')
   }
   
-  // 👇 [수정됨] window.ethereum -> (window as any).ethereum
+  // [수정됨] window.ethereum -> (window as any).ethereum
   const accounts = await (window as any).ethereum.request<string[]>({
     method: 'eth_requestAccounts',
   })
